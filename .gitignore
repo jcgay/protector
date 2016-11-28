@@ -30,6 +30,9 @@ _testmain.go
 # external packages folder
 vendor/
 
+# Binary
+protector
+
 # JetBrains
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and Webstorm
 
@@ -59,3 +62,4 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+.autoenv.zsh
