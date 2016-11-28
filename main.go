@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"regexp"
 )
 
 const (
@@ -16,10 +17,21 @@ const (
 )
 
 var (
-	ghToken string
-	dryrun  bool
-	version bool
+	ghToken         string
+	dryrun          bool
+	version         bool
+	protectBranches []*regexp.Regexp
 )
+
+type stringsFlag []string
+
+func (s *stringsFlag) String() string {
+	return fmt.Sprintf("%s", *s)
+}
+func (s *stringsFlag) Set(value string) error {
+	*s = append(*s, value)
+	return nil
+}
 
 func init() {
 	// parse flags
@@ -27,6 +39,9 @@ func init() {
 	flag.BoolVar(&dryrun, "dry-run", false, "do not make any changes, just print out what would have been done")
 	flag.BoolVar(&version, "version", false, "print version and exit")
 	flag.BoolVar(&version, "v", false, "print version and exit (shorthand)")
+
+	var branches stringsFlag
+	flag.Var(&branches, "branches", "branches to include (as regexp)")
 
 	flag.Usage = func() {
 		fmt.Fprint(os.Stderr, fmt.Sprintf(BANNER, VERSION))
@@ -42,6 +57,15 @@ func init() {
 
 	if ghToken == "" {
 		usageAndExit("GitHub token cannot be empty.", 1)
+	}
+
+	protectBranches = make([]*regexp.Regexp, 0)
+	for _, branch := range branches {
+		protectBranches = append(protectBranches, regexp.MustCompile(branch))
+	}
+
+	if len(protectBranches) == 0 {
+		protectBranches = append(protectBranches, regexp.MustCompile("master"))
 	}
 }
 
@@ -85,7 +109,7 @@ func protect(client *github.Client, repo *github.Repository) error {
 	}
 
 	for _, branch := range branches {
-		if *branch.Name == "master" {
+		if mustEdit(*branch.Name) {
 			if *branch.Protection.Enabled {
 				fmt.Printf("%s: %s is already protected\n", *repo.FullName, *branch.Name)
 				return nil
@@ -105,6 +129,14 @@ func protect(client *github.Client, repo *github.Repository) error {
 	}
 
 	return nil
+}
+func mustEdit(branchName string) bool {
+	for _, toProtect := range protectBranches {
+		if toProtect.MatchString(branchName) {
+			return true
+		}
+	}
+	return false
 }
 
 func listRepositories(client *github.Client, startPage int) []*github.Repository {
