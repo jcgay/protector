@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"strings"
 )
 
 const (
@@ -17,10 +18,11 @@ const (
 )
 
 var (
-	ghToken         string
-	dryrun          bool
-	version         bool
-	protectBranches []*regexp.Regexp
+	ghToken             string
+	dryrun              bool
+	version             bool
+	protectBranches     []*regexp.Regexp
+	protectRepositories stringsFlag
 )
 
 type stringsFlag []string
@@ -39,6 +41,7 @@ func init() {
 	flag.BoolVar(&dryrun, "dry-run", false, "do not make any changes, just print out what would have been done")
 	flag.BoolVar(&version, "version", false, "print version and exit")
 	flag.BoolVar(&version, "v", false, "print version and exit (shorthand)")
+	flag.Var(&protectRepositories, "repos", "repositories fullname to protect (ex: jcgay/maven-color)")
 
 	var branches stringsFlag
 	flag.Var(&branches, "branches", "branches to include (as regexp)")
@@ -76,7 +79,12 @@ func main() {
 	tc := oauth2.NewClient(oauth2.NoContext, ts)
 	client := github.NewClient(tc)
 
-	repos := listRepositories(client, 1)
+	var repos []*github.Repository
+	if len(protectRepositories) > 0 {
+		repos = fetchRepositories(client, protectRepositories)
+	} else {
+		repos = listRepositories(client, 1)
+	}
 
 	for _, repo := range repos {
 		if (*repo.Permissions)["admin"] == false {
@@ -91,6 +99,16 @@ func main() {
 	}
 
 	os.Exit(0)
+}
+func fetchRepositories(client *github.Client, repoFullNames []string) []*github.Repository {
+	result := make([]*github.Repository, 0)
+	for _, repoFullName := range repoFullNames {
+		metas := strings.SplitN(repoFullName, "/", 2)
+		if repo, _, err := client.Repositories.Get(metas[0], metas[1]); err == nil {
+			result = append(result, repo)
+		}
+	}
+	return result
 }
 
 func protect(client *github.Client, repo *github.Repository) error {
