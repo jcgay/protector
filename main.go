@@ -21,6 +21,7 @@ var (
 	ghToken             string
 	dryrun              bool
 	version             bool
+	unprotect           bool
 	protectBranches     []*regexp.Regexp
 	protectRepositories stringsFlag
 )
@@ -41,6 +42,7 @@ func init() {
 	flag.BoolVar(&dryrun, "dry-run", false, "do not make any changes, just print out what would have been done")
 	flag.BoolVar(&version, "version", false, "print version and exit")
 	flag.BoolVar(&version, "v", false, "print version and exit (shorthand)")
+	flag.BoolVar(&unprotect, "free", false, "remove branch protection")
 	flag.Var(&protectRepositories, "repos", "repositories fullname to protect (ex: jcgay/maven-color)")
 
 	var branches stringsFlag
@@ -128,17 +130,30 @@ func protect(client *github.Client, repo *github.Repository) error {
 
 	for _, branch := range branches {
 		if mustEdit(*branch.Name) {
-			if *branch.Protection.Enabled {
+			if *branch.Protection.Enabled && !unprotect {
 				fmt.Printf("%s: %s is already protected\n", *repo.FullName, *branch.Name)
 				return nil
 			}
 
-			fmt.Printf("%s: %s will be set to protected\n", *repo.FullName, *branch.Name)
+			if !*branch.Protection.Enabled && unprotect {
+				fmt.Printf("%s: %s is already unprotected\n", *repo.FullName, *branch.Name)
+				return nil
+			}
+
+			if !unprotect {
+				fmt.Printf("%s: %s will be set to protected\n", *repo.FullName, *branch.Name)
+			} else {
+				fmt.Printf("%s: %s will be freed\n", *repo.FullName, *branch.Name)
+			}
+
 			if dryrun {
 				return nil
 			}
 
-			activateProtection := true
+			activateProtection := false
+			if !unprotect {
+				activateProtection = true
+			}
 			branch.Protection.Enabled = &activateProtection
 			if _, _, err := client.Repositories.EditBranch(*repo.Owner.Login, *repo.Name, *branch.Name, branch); err != nil {
 				return err

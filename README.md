@@ -13,6 +13,8 @@ protector - v0.1.0-SNAPSHOT
     	branches to include (as regexp)
   -dry-run
     	do not make any changes, just print out what would have been done
+  -free
+    	remove branch protection
   -repos value
     	repositories fullname to protect (ex: jcgay/maven-color)
   -token string
