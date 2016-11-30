@@ -10,6 +10,7 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"sync"
 )
 
 const (
@@ -81,35 +82,52 @@ func main() {
 	tc := oauth2.NewClient(oauth2.NoContext, ts)
 	client := github.NewClient(tc)
 
-	var repos []*github.Repository
+	var repos chan *github.Repository
 	if len(protectRepositories) > 0 {
 		repos = fetchRepositories(client, protectRepositories)
 	} else {
 		repos = listRepositories(client, 1)
 	}
 
-	for _, repo := range repos {
-		if (*repo.Permissions)["admin"] == false {
-			fmt.Printf("%s: you don't have admin rights to modify this repository\n", *repo.FullName)
-			continue
-		}
+	var wg sync.WaitGroup
+	for repo := range repos {
+		wg.Add(1)
+		go func(repository *github.Repository) {
+			defer wg.Done()
+			if (*repository.Permissions)["admin"] == false {
+				fmt.Printf("%s: you don't have admin rights to modify this repository\n", *repository.FullName)
+				return
+			}
 
-		err := process(client, repo)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-		}
+			err := process(client, repository)
+			if err != nil {
+				fmt.Fprintln(os.Stderr, err)
+			}
+		}(repo)
 	}
+	wg.Wait()
 
 	os.Exit(0)
 }
-func fetchRepositories(client *github.Client, repoFullNames []string) []*github.Repository {
-	result := make([]*github.Repository, 0)
+func fetchRepositories(client *github.Client, repoFullNames []string) chan *github.Repository {
+	result := make(chan *github.Repository)
+	var wg sync.WaitGroup
 	for _, repoFullName := range repoFullNames {
-		metas := strings.SplitN(repoFullName, "/", 2)
-		if repo, _, err := client.Repositories.Get(metas[0], metas[1]); err == nil {
-			result = append(result, repo)
-		}
+		wg.Add(1)
+		go func(name string) {
+			defer wg.Done()
+			metas := strings.SplitN(name, "/", 2)
+			if repo, _, err := client.Repositories.Get(metas[0], metas[1]); err == nil {
+				result <- repo
+			}
+		}(repoFullName)
 	}
+
+	go func() {
+		wg.Wait()
+		close(result)
+	}()
+
 	return result
 }
 
@@ -179,7 +197,13 @@ func mustEdit(branchName string) bool {
 	return false
 }
 
-func listRepositories(client *github.Client, startPage int) []*github.Repository {
+func listRepositories(client *github.Client, startPage int) chan *github.Repository {
+	result := make(chan *github.Repository, 20)
+	listRepositoriesInChan(client, startPage, result)
+	return result
+}
+
+func listRepositoriesInChan(client *github.Client, startPage int, result chan *github.Repository) {
 	opt := &github.RepositoryListOptions{
 		ListOptions: github.ListOptions{
 			Page:    startPage,
@@ -190,14 +214,22 @@ func listRepositories(client *github.Client, startPage int) []*github.Repository
 	repos, resp, err := client.Repositories.List("", opt)
 	if err != nil {
 		log.Println(err)
-		return make([]*github.Repository, 0)
+		close(result)
+		return
+	}
+
+	for _, repo := range repos {
+		result <- repo
 	}
 
 	if startPage == resp.LastPage || resp.NextPage == 0 {
-		return make([]*github.Repository, 0)
+		close(result)
+		return
 	}
 
-	return append(repos, listRepositories(client, resp.NextPage)...)
+	go func() {
+		listRepositoriesInChan(client, resp.NextPage, result)
+	}()
 }
 
 func usageAndExit(message string, exitCode int) {
