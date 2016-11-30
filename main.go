@@ -94,7 +94,7 @@ func main() {
 			continue
 		}
 
-		err := protect(client, repo)
+		err := process(client, repo)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 		}
@@ -113,7 +113,7 @@ func fetchRepositories(client *github.Client, repoFullNames []string) []*github.
 	return result
 }
 
-func protect(client *github.Client, repo *github.Repository) error {
+func process(client *github.Client, repo *github.Repository) error {
 	opt := &github.ListOptions{
 		PerPage: 100,
 	}
@@ -130,39 +130,46 @@ func protect(client *github.Client, repo *github.Repository) error {
 
 	for _, branch := range branches {
 		if mustEdit(*branch.Name) {
-			if *branch.Protection.Enabled && !unprotect {
-				fmt.Printf("%s: %s is already protected\n", *repo.FullName, *branch.Name)
-				return nil
-			}
-
-			if !*branch.Protection.Enabled && unprotect {
-				fmt.Printf("%s: %s is already unprotected\n", *repo.FullName, *branch.Name)
-				return nil
-			}
-
-			if !unprotect {
-				fmt.Printf("%s: %s will be set to protected\n", *repo.FullName, *branch.Name)
-			} else {
-				fmt.Printf("%s: %s will be freed\n", *repo.FullName, *branch.Name)
-			}
-
-			if dryrun {
-				return nil
-			}
-
-			activateProtection := false
-			if !unprotect {
-				activateProtection = true
-			}
-			branch.Protection.Enabled = &activateProtection
-			if _, _, err := client.Repositories.EditBranch(*repo.Owner.Login, *repo.Name, *branch.Name, branch); err != nil {
-				return err
-			}
+			protect(client, repo, branch)
 		}
 	}
 
 	return nil
 }
+
+func protect(client *github.Client, repo *github.Repository, branch *github.Branch) error {
+	if *branch.Protection.Enabled && !unprotect {
+		fmt.Printf("%s: %s is already protected\n", *repo.FullName, *branch.Name)
+		return nil
+	}
+
+	if !*branch.Protection.Enabled && unprotect {
+		fmt.Printf("%s: %s is already unprotected\n", *repo.FullName, *branch.Name)
+		return nil
+	}
+
+	if !unprotect {
+		fmt.Printf("%s: %s will be set to protected\n", *repo.FullName, *branch.Name)
+	} else {
+		fmt.Printf("%s: %s will be freed\n", *repo.FullName, *branch.Name)
+	}
+
+	if dryrun {
+		return nil
+	}
+
+	activateProtection := false
+	if !unprotect {
+		activateProtection = true
+	}
+	branch.Protection.Enabled = &activateProtection
+	if _, _, err := client.Repositories.EditBranch(*repo.Owner.Login, *repo.Name, *branch.Name, branch); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func mustEdit(branchName string) bool {
 	for _, toProtect := range protectBranches {
 		if toProtect.MatchString(branchName) {
