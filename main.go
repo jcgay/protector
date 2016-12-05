@@ -156,12 +156,12 @@ func process(client *github.Client, repo *github.Repository) error {
 }
 
 func protect(client *github.Client, repo *github.Repository, branch *github.Branch) error {
-	if *branch.Protection.Enabled && !unprotect {
+	if *branch.Protected && !unprotect {
 		fmt.Printf("%s: %s is already protected\n", *repo.FullName, *branch.Name)
 		return nil
 	}
 
-	if !*branch.Protection.Enabled && unprotect {
+	if !*branch.Protected && unprotect {
 		fmt.Printf("%s: %s is already unprotected\n", *repo.FullName, *branch.Name)
 		return nil
 	}
@@ -180,8 +180,13 @@ func protect(client *github.Client, repo *github.Repository, branch *github.Bran
 	if !unprotect {
 		activateProtection = true
 	}
-	branch.Protection.Enabled = &activateProtection
-	if _, _, err := client.Repositories.EditBranch(*repo.Owner.Login, *repo.Name, *branch.Name, branch); err != nil {
+	branch.Protected = &activateProtection
+	protectionReq := &github.ProtectionRequest{
+		RequiredStatusChecks: nil,
+		Restrictions: nil,
+	}
+
+	if _, _, err := client.Repositories.UpdateBranchProtection(*repo.Owner.Login, *repo.Name, *branch.Name, protectionReq); err != nil {
 		return err
 	}
 
