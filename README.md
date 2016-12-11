@@ -3,7 +3,7 @@
 Protect (and free) your GitHub branches.  
 Greatly inspired by [audit](https://github.com/jessfraz/audit) and [pepper](https://github.com/jessfraz/pepper).
 
-# Usage
+## Usage
 
 ```
 $> protector -h                                                                                                                                                           
@@ -23,3 +23,9 @@ protector - v0.1.0-SNAPSHOT
   -version
     	print version and exit
 ```
+
+## Build
+
+### Status
+
+[![Build Status](https://travis-ci.org/jcgay/protector.svg?branch=master)](https://travis-ci.org/jcgay/protector)
