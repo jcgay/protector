@@ -15,6 +15,8 @@ protector - v0.1.0-SNAPSHOT
     	do not make any changes, just print out what would have been done
   -free
     	remove branch protection
+  -orgs value
+    	organizations name to protect
   -repos value
     	repositories fullname to protect (ex: jcgay/maven-color)
   -token string

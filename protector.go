@@ -22,6 +22,7 @@ var (
 	unprotect           bool
 	protectBranches     []*regexp.Regexp
 	protectRepositories stringsFlag
+	orgs                stringsFlag
 )
 
 type stringsFlag []string
@@ -48,6 +49,7 @@ func main() {
 	flag.BoolVar(&version, "v", false, "print version and exit (shorthand)")
 	flag.BoolVar(&unprotect, "free", false, "remove branch protection")
 	flag.Var(&protectRepositories, "repos", "repositories fullname to protect (ex: jcgay/maven-color)")
+	flag.Var(&orgs, "orgs", "organizations name to protect")
 
 	var branches stringsFlag
 	flag.Var(&branches, "branches", "branches to include (as regexp)")
@@ -66,6 +68,10 @@ func main() {
 
 	if ghToken == "" {
 		usageAndExit("GitHub token cannot be empty.", 1)
+	}
+
+	if len(orgs) > 0 && len(protectRepositories) > 0 {
+		usageAndExit("Can't filter repositories by name and organization at the same time", 1)
 	}
 
 	protectBranches = make([]*regexp.Regexp, 0)
@@ -88,6 +94,11 @@ func main() {
 		ghr = &selectedGitHubRepositories{
 			client:        client,
 			selectedRepos: protectRepositories,
+		}
+	} else if len(orgs) > 0 {
+		ghr = &orgsGitHubRepositories{
+			client: client,
+			orgs:   orgs,
 		}
 	} else {
 		ghr = &allGitHubRepositories{
