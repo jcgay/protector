@@ -8,6 +8,7 @@ import (
 	"os"
 	"regexp"
 	"sync"
+	"context"
 )
 
 const (
@@ -36,9 +37,9 @@ func (s *stringsFlag) Set(value string) error {
 }
 
 type repositoriesService interface {
-	ListBranches(owner string, repo string, opt *github.ListOptions) ([]*github.Branch, *github.Response, error)
-	UpdateBranchProtection(owner, repo, branch string, preq *github.ProtectionRequest) (*github.Protection, *github.Response, error)
-	RemoveBranchProtection(owner, repo, branch string) (*github.Response, error)
+	ListBranches(ctx context.Context, owner string, repo string, opt *github.ListOptions) ([]*github.Branch, *github.Response, error)
+	UpdateBranchProtection(ctx context.Context, owner, repo, branch string, preq *github.ProtectionRequest) (*github.Protection, *github.Response, error)
+	RemoveBranchProtection(ctx context.Context, owner, repo, branch string) (*github.Response, error)
 }
 
 func main() {

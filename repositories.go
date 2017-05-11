@@ -5,6 +5,7 @@ import (
 	"log"
 	"strings"
 	"sync"
+	"context"
 )
 
 type repositories interface {
@@ -29,7 +30,7 @@ func (aghr *allGitHubRepositories) list(startPage int, result chan *github.Repos
 		},
 	}
 
-	repos, resp, err := aghr.client.Repositories.List("", opt)
+	repos, resp, err := aghr.client.Repositories.List(context.TODO(), "", opt)
 	if err != nil {
 		log.Println(err)
 		close(result)
@@ -63,7 +64,7 @@ func (sghr *selectedGitHubRepositories) fetch() chan *github.Repository {
 		go func(name string) {
 			defer wg.Done()
 			metas := strings.SplitN(name, "/", 2)
-			if repo, _, err := sghr.client.Repositories.Get(metas[0], metas[1]); err == nil {
+			if repo, _, err := sghr.client.Repositories.Get(context.TODO(), metas[0], metas[1]); err == nil {
 				result <- repo
 			}
 		}(repoFullName)
@@ -109,7 +110,7 @@ func (aghr *orgsGitHubRepositories) listByOrg(startPage int, orga string, result
 		},
 	}
 
-	repos, resp, err := aghr.client.Repositories.ListByOrg(orga, opt)
+	repos, resp, err := aghr.client.Repositories.ListByOrg(context.TODO(), orga, opt)
 	if err != nil {
 		log.Println(err)
 		return

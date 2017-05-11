@@ -6,11 +6,12 @@ import (
 	"net/http"
 	"regexp"
 	"testing"
+	"context"
 )
 
 type TestProtectRepositoryMock struct{}
 
-func (p *TestProtectRepositoryMock) ListBranches(owner string, repo string, opt *github.ListOptions) ([]*github.Branch, *github.Response, error) {
+func (p *TestProtectRepositoryMock) ListBranches(ctx context.Context, owner string, repo string, opt *github.ListOptions) ([]*github.Branch, *github.Response, error) {
 	name := "branche-1"
 	notProtected := false
 	branch1 := &github.Branch{
@@ -27,11 +28,11 @@ func (p *TestProtectRepositoryMock) ListBranches(owner string, repo string, opt 
 	return []*github.Branch{branch1}, resp, nil
 }
 
-func (p *TestProtectRepositoryMock) UpdateBranchProtection(owner, repo, branch string, preq *github.ProtectionRequest) (*github.Protection, *github.Response, error) {
+func (p *TestProtectRepositoryMock) UpdateBranchProtection(ctx context.Context, owner, repo, branch string, preq *github.ProtectionRequest) (*github.Protection, *github.Response, error) {
 	return nil, nil, nil
 }
 
-func (p *TestProtectRepositoryMock) RemoveBranchProtection(owner, repo, branch string) (*github.Response, error) {
+func (p *TestProtectRepositoryMock) RemoveBranchProtection(ctx context.Context, owner, repo, branch string) (*github.Response, error) {
 	return nil, nil
 }
 

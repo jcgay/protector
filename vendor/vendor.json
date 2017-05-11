@@ -3,10 +3,28 @@
 	"ignore": "test",
 	"package": [
 		{
-			"checksumSHA1": "xNDw/9h+y9gmFllZjEAbfe307Rs=",
+			"path": "appengine",
+			"revision": ""
+		},
+		{
+			"path": "appengine_internal",
+			"revision": ""
+		},
+		{
+			"path": "appengine_internal/base",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "kBeNcaKk56FguvPSUCEaH6AxpRc=",
+			"path": "github.com/golang/protobuf/proto",
+			"revision": "b50ceb1fa9818fa4d78b016c2d4ae025593a7ce3",
+			"revisionTime": "2017-05-09T16:59:01Z"
+		},
+		{
+			"checksumSHA1": "kHUF9ZfaEI5wgqGCfukYWAogzeo=",
 			"path": "github.com/google/go-github/github",
-			"revision": "5c45bca952b96dedace6c307caff915483013003",
-			"revisionTime": "2016-12-09T18:12:45Z"
+			"revision": "c03cf196876fc0b7cf8db2516848536778ea4e29",
+			"revisionTime": "2017-05-07T00:07:02Z"
 		},
 		{
 			"checksumSHA1": "yyAzHoiVLu+xywYI2BDyRq6sOqE=",
@@ -31,6 +49,54 @@
 			"path": "golang.org/x/oauth2/internal",
 			"revision": "da3ce8d62a7f77aadfda06cb82bd604d6469c645",
 			"revisionTime": "2016-12-09T11:58:39Z"
+		},
+		{
+			"checksumSHA1": "WPEbk80NB3Esdh4Yk0PXr2K7xVU=",
+			"path": "google.golang.org/appengine",
+			"revision": "170382fa85b10b94728989dfcf6cc818b335c952",
+			"revisionTime": "2017-04-10T19:43:55Z"
+		},
+		{
+			"checksumSHA1": "4o2JkeR2LyUfZ7BQIzHUejyqKno=",
+			"path": "google.golang.org/appengine/internal",
+			"revision": "170382fa85b10b94728989dfcf6cc818b335c952",
+			"revisionTime": "2017-04-10T19:43:55Z"
+		},
+		{
+			"checksumSHA1": "x6Thdfyasqd68dWZWqzWWeIfAfI=",
+			"path": "google.golang.org/appengine/internal/app_identity",
+			"revision": "170382fa85b10b94728989dfcf6cc818b335c952",
+			"revisionTime": "2017-04-10T19:43:55Z"
+		},
+		{
+			"checksumSHA1": "TsNO8P0xUlLNyh3Ic/tzSp/fDWM=",
+			"path": "google.golang.org/appengine/internal/base",
+			"revision": "170382fa85b10b94728989dfcf6cc818b335c952",
+			"revisionTime": "2017-04-10T19:43:55Z"
+		},
+		{
+			"checksumSHA1": "5QsV5oLGSfKZqTCVXP6NRz5T4Tw=",
+			"path": "google.golang.org/appengine/internal/datastore",
+			"revision": "170382fa85b10b94728989dfcf6cc818b335c952",
+			"revisionTime": "2017-04-10T19:43:55Z"
+		},
+		{
+			"checksumSHA1": "Gep2T9zmVYV8qZfK2gu3zrmG6QE=",
+			"path": "google.golang.org/appengine/internal/log",
+			"revision": "170382fa85b10b94728989dfcf6cc818b335c952",
+			"revisionTime": "2017-04-10T19:43:55Z"
+		},
+		{
+			"checksumSHA1": "eLZVX1EHLclFtQnjDIszsdyWRHo=",
+			"path": "google.golang.org/appengine/internal/modules",
+			"revision": "170382fa85b10b94728989dfcf6cc818b335c952",
+			"revisionTime": "2017-04-10T19:43:55Z"
+		},
+		{
+			"checksumSHA1": "a1XY7rz3BieOVqVI2Et6rKiwQCk=",
+			"path": "google.golang.org/appengine/internal/remote_api",
+			"revision": "170382fa85b10b94728989dfcf6cc818b335c952",
+			"revisionTime": "2017-04-10T19:43:55Z"
 		}
 	],
 	"rootPath": "github.com/jcgay/protector"

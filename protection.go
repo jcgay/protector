@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"regexp"
+	"context"
 )
 
 type protection interface {
@@ -62,7 +63,7 @@ func (gp *githubProtection) filterBranches(repo *github.Repository) ([]*github.B
 		PerPage: 100,
 	}
 
-	branches, resp, err := gp.repositoriesService.ListBranches(*repo.Owner.Login, *repo.Name, opt)
+	branches, resp, err := gp.repositoriesService.ListBranches(context.TODO(), *repo.Owner.Login, *repo.Name, opt)
 
 	if err != nil {
 		return nil, err
@@ -101,7 +102,7 @@ func (gp *githubProtection) lock(repo *github.Repository, branch *github.Branch)
 		RequiredStatusChecks: nil,
 		Restrictions:         nil,
 	}
-	if _, _, err := gp.repositoriesService.UpdateBranchProtection(*repo.Owner.Login, *repo.Name, *branch.Name, protectionReq); err != nil {
+	if _, _, err := gp.repositoriesService.UpdateBranchProtection(context.TODO(), *repo.Owner.Login, *repo.Name, *branch.Name, protectionReq); err != nil {
 		return "", failure(withRepo(err.Error(), repo, branch))
 	}
 
@@ -117,7 +118,7 @@ func (gp *githubProtection) unlock(repo *github.Repository, branch *github.Branc
 		return success(withRepo("will be freed", repo, branch)), ""
 	}
 
-	if _, err := gp.repositoriesService.RemoveBranchProtection(*repo.Owner.Login, *repo.Name, *branch.Name); err != nil {
+	if _, err := gp.repositoriesService.RemoveBranchProtection(context.TODO(), *repo.Owner.Login, *repo.Name, *branch.Name); err != nil {
 		return "", failure(withRepo(err.Error(), repo, branch))
 	}
 
