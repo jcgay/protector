@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"github.com/google/go-github/github"
@@ -8,11 +9,11 @@ import (
 	"os"
 	"regexp"
 	"sync"
-	"context"
 )
 
 const (
-	BANNER  = "protector - v%s\n"
+	banner = "protector - v%s\n"
+	// VERSION injected at compile time by goxc (see https://github.com/laher/goxc/wiki/versioning#version-number-interpolation)
 	VERSION = "0.1.0-SNAPSHOT"
 )
 
@@ -56,7 +57,7 @@ func main() {
 	flag.Var(&branches, "branches", "branches to include (as regexp)")
 
 	flag.Usage = func() {
-		fmt.Fprint(os.Stderr, fmt.Sprintf(BANNER, VERSION))
+		fmt.Fprint(os.Stderr, fmt.Sprintf(banner, VERSION))
 		flag.PrintDefaults()
 	}
 

@@ -1,11 +1,11 @@
 package main
 
 import (
+	"context"
 	"github.com/google/go-github/github"
 	"log"
 	"strings"
 	"sync"
-	"context"
 )
 
 type repositories interface {

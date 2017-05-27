@@ -31,3 +31,4 @@ protector - v0.1.0-SNAPSHOT
 ### Status
 
 [![Build Status](https://travis-ci.org/jcgay/protector.svg?branch=master)](https://travis-ci.org/jcgay/protector)
+[![Code Report](https://goreportcard.com/badge/github.com/jcgay/protector)](https://goreportcard.com/report/github.com/jcgay/protector)

@@ -1,13 +1,12 @@
 package main
 
 import (
-	"errors"
+	"context"
 	"fmt"
 	"github.com/google/go-github/github"
 	"io"
 	"net/http"
 	"regexp"
-	"context"
 )
 
 type protection interface {
@@ -70,7 +69,7 @@ func (gp *githubProtection) filterBranches(repo *github.Repository) ([]*github.B
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, errors.New(fmt.Sprintf("Received HTTP response [%s] when listing branches for %s.", resp.Status, repo.FullName))
+		return nil, fmt.Errorf("Received HTTP response [%s] when listing branches for %s", resp.Status, repo.FullName)
 	}
 
 	result := make([]*github.Branch, 0)

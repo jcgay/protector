@@ -2,11 +2,11 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"github.com/google/go-github/github"
 	"net/http"
 	"regexp"
 	"testing"
-	"context"
 )
 
 type TestProtectRepositoryMock struct{}
