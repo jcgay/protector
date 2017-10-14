@@ -60,3 +60,6 @@ crashlytics-build.properties
 fabric.properties
 
 .autoenv.zsh
+
+# Cross Platform builds
+cross/

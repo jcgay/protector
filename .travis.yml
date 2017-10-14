@@ -1,8 +1,33 @@
 language: go
+sudo: false
 go:
-  - tip
+  - 1.9.x
 before_install:
   - go get github.com/mattn/goveralls
+  - go get github.com/golang/lint/golint
 script:
   - $HOME/gopath/bin/goveralls -service=travis-ci
-  
+  - make all release
+before_deploy:
+  - make prepare-bintray
+deploy:
+  - provider: releases
+    api_key:
+      secure: M2iP8Bb3ICWHftyqOEKDfLLq68sOZYB3ALA1nCi7g7N95Ebot5szTNCcZt7ORpdXuFdrsZwKWrv9g0rM4L4dwn2ndjQ9WZf3/LSpfb7EeMK1TKgcHnTAAekRwkJPEvb7ZpMIBDHxoAU719QoyA64YodVkMUm1vqGHuv1h4hx4IpaanJtLITqPPhTxW3kCTa0K9sRcnwbm03ptvLBRcDiQJ0mukjaMesKg65P4S5sP1Nqh/HN9BkdQEI7UjftfGdoTlI+uRYF1yHc+a550dQfo09osCPnlmuK/SwUXp7HpSPP0nHHNs1VYwfheVes0ru28ZoxebVH+9u8RwjNsEWGIT6vNDaBJdeVl86T7ehgJLYhkPg5GJL6+4fTKD3AyjtfH2gmahsjIpaNdGC9WdH6OmWzc+cQyr+vNfLdlmze+sQR3PwnCxZErJzggIvpuNVsaCP3d4W1J5JYdZ9M2uGDz3CF49betD1Z+PcbJm9WXBlr2c6SiH2UOCprMc/9Lgrfn9cm6Q41HMyC7KHmPS/QIS2TgEn2vnC4yTudxXvpqOZhhGTslNXup0YJhaRdTswjFg7Isa+/TY7kXYFQAw37pWphljzXers665y0hUvOs4hF9MPrKRLZ9xNIA5QU7THskOrwvC5wJ2VBIiazbBe9UaxkAbXsr4zq/1jN6vkrGiE=
+    go: 1.9.x
+    file_glob: true
+    file: cross/*
+    skip_cleanup: true
+    on:
+      repo: jcgay/protector
+      tags: true
+  - provider: bintray
+    user: jcgay
+    key:
+      secure: f9fLVTrDNWakP6D0JFK2YwqDOIO5tXbv4b4GkTQlBjSL2+FrLU+0AJXqm/6nDOFbPprgzocHxm4F61Bg89uKLRvwqKpmM55vV+kxfo5ilZFlbyD36ryoUdMTyCEFrwjCX/EKiMNnzYuo+WfnKDtm7Y99ccWFt0AMfRg3lGDgVd4LXhAUWYcqetsyW9IIYwzMO1w/mUEawFB6QyfJzzh32b0axBg6aYVv5UKdDora4Rn4ltr0gGSjfZqbUbp3aQgvWZZMzkCQyhC0GeX6nmEBEwHvuhxoXFvzt8a3eKGLhpU605Tr9bdAwag5GLxvQ4nYSbG059HJ1NvSppZWQrIbvK+PwiLoC1uR/XYs8aAI6qZKxN47mlPqqOnAdmkYn70EBchv+93YrVVpn3XCjPmS+Rzkp56lUlKTnu9Sm84Y/eXab7MffzxsIJiX2d4QhqA2NdmRoLCbrEavT8NFTA9VBivX8tkj5CeGTtlgpL2VTWg8HCwgOK0sjCb00afZqACfviSV4bM+7J/TePJjFqJwTrJ15KRKShdjSa8l2PzeuQV6YlOijLWd7aLNNAemVtYBDtST0FPM2oXWaiQFcUjXGrPudONMnrBuISuetew9iEV7gxx5qEvm1GHq9Uyi1SEfvh/Ly1ZsQBmvVAeMmjr0Ief3rmcqjjvU+ieA6V2qbFc=
+    go: 1.9.x
+    file: bintray/descriptor.json
+    skip_cleanup: true
+    on:
+      repo: jcgay/protector
+      tags: true

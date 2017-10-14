@@ -1,0 +1,31 @@
+{
+    "package": {
+        "name": "protector",
+        "repo": "tools",
+        "subject": "jcgay",
+        "desc": "Protect GitHub branches",
+        "website_url": "https://github.com/jcgay/protector",
+        "issue_tracker_url": "https://github.com/jcgay/protector/issues",
+        "vcs_url": "https://github.com/jcgay/protector.git",
+        "github_use_tag_release_notes": true,
+        "github_release_notes_file": "CHANGELOG.md",
+        "licenses": ["MIT"],
+        "labels": ["github", "protection", "go"],
+        "public_download_numbers": false,
+        "public_stats": false
+    },
+
+    "version": {
+        "name": "%VERSION%",
+        "desc": "%VERSION%",
+        "released": "%DATE%",
+        "vcs_tag": "%VERSION%",
+        "gpgSign": false
+    },
+
+    "files":
+        [
+        {"includePattern": "cross/(.*)", "uploadPattern": "%VERSION%/$1"}
+        ],
+    "publish": true
+}

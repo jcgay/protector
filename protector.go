@@ -6,15 +6,14 @@ import (
 	"fmt"
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
+	currentVersion "github.com/jcgay/protector/version"
 	"os"
 	"regexp"
 	"sync"
 )
 
 const (
-	banner = "protector - v%s\n"
-	// VERSION injected at compile time by goxc (see https://github.com/laher/goxc/wiki/versioning#version-number-interpolation)
-	VERSION = "0.1.0-SNAPSHOT"
+	banner = "protector - %s (%s)\n"
 )
 
 var (
@@ -58,14 +57,14 @@ func main() {
 	flag.Var(&branches, "branches", "branches to include (as regexp)")
 
 	flag.Usage = func() {
-		fmt.Fprint(os.Stderr, fmt.Sprintf(banner, VERSION))
+		fmt.Fprint(os.Stderr, fmt.Sprintf(banner, currentVersion.VERSION, currentVersion.GITCOMMIT))
 		flag.PrintDefaults()
 	}
 
 	flag.Parse()
 
 	if version {
-		fmt.Printf("v%s", VERSION)
+		fmt.Printf("%s (%s)", currentVersion.VERSION, currentVersion.GITCOMMIT)
 		os.Exit(0)
 	}
 
