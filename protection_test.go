@@ -13,10 +13,9 @@ type TestProtectRepositoryMock struct{}
 
 func (p *TestProtectRepositoryMock) ListBranches(ctx context.Context, owner string, repo string, opt *github.ListOptions) ([]*github.Branch, *github.Response, error) {
 	name := "branche-1"
-	notProtected := false
 	branch1 := &github.Branch{
 		Name:      &name,
-		Protected: &notProtected,
+		Protected: nil,
 	}
 
 	resp := &github.Response{
@@ -34,6 +33,15 @@ func (p *TestProtectRepositoryMock) UpdateBranchProtection(ctx context.Context, 
 
 func (p *TestProtectRepositoryMock) RemoveBranchProtection(ctx context.Context, owner, repo, branch string) (*github.Response, error) {
 	return nil, nil
+}
+
+func (p *TestProtectRepositoryMock) GetBranch(ctx context.Context, owner, repo, branchName string) (*github.Branch, *github.Response, error) {
+	notProtected := false
+	branch := &github.Branch{
+		Name:      &branchName,
+		Protected: &notProtected,
+	}
+	return branch, nil, nil
 }
 
 func TestProtectRepository(t *testing.T) {

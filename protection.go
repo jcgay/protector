@@ -47,13 +47,13 @@ func (gp *githubProtection) process(repo *github.Repository, modify func(*github
 
 func (gp *githubProtection) protect(repo *github.Repository) {
 	gp.process(repo, func(branch *github.Branch) (success, failure) {
-		return gp.lock(repo, branch)
+		return gp.lock(repo, *branch.Name)
 	})
 }
 
 func (gp *githubProtection) free(repo *github.Repository) {
 	gp.process(repo, func(branch *github.Branch) (success, failure) {
-		return gp.unlock(repo, branch)
+		return gp.unlock(repo, *branch.Name)
 	})
 }
 
@@ -86,7 +86,12 @@ func withRepo(msg string, repo *github.Repository, branch *github.Branch) string
 	return fmt.Sprintf("%s: %s %s", *repo.FullName, *branch.Name, msg)
 }
 
-func (gp *githubProtection) lock(repo *github.Repository, branch *github.Branch) (success, failure) {
+func (gp *githubProtection) lock(repo *github.Repository, branchName string) (success, failure) {
+	branch, _, err := gp.repositoriesService.GetBranch(context.TODO(), *repo.Owner.Login, *repo.Name, branchName)
+	if err != nil {
+		return "", failure(withRepo(err.Error(), repo, branch))
+	}
+
 	if *branch.Protected {
 		return success(withRepo("is already protected", repo, branch)), ""
 	}
@@ -108,7 +113,12 @@ func (gp *githubProtection) lock(repo *github.Repository, branch *github.Branch)
 	return success(withRepo("is now protected", repo, branch)), ""
 }
 
-func (gp *githubProtection) unlock(repo *github.Repository, branch *github.Branch) (success, failure) {
+func (gp *githubProtection) unlock(repo *github.Repository, branchName string) (success, failure) {
+	branch, _, err := gp.repositoriesService.GetBranch(context.TODO(), *repo.Owner.Login, *repo.Name, branchName)
+	if err != nil {
+		return "", failure(withRepo(err.Error(), repo, branch))
+	}
+
 	if !*branch.Protected {
 		return success(withRepo("is already unprotected", repo, branch)), ""
 	}
