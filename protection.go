@@ -69,7 +69,7 @@ func (gp *githubProtection) filterBranches(repo *github.Repository) ([]*github.B
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("Received HTTP response [%s] when listing branches for %s", resp.Status, repo.FullName)
+		return nil, fmt.Errorf("Received HTTP response [%s] when listing branches for %s", resp.Status, *repo.FullName)
 	}
 
 	result := make([]*github.Branch, 0)
